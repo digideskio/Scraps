@@ -1,0 +1,11 @@
+syntax on
+set cursorline
+set number
+set colorcolumn=80
+set textwidth=80
+set clipboard=unnamedplus
+set showtabline=4
+set shiftwidth=4
+set tabstop=4
+set formatoptions=tcro
+set wrapmargin=2

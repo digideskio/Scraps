@@ -1,0 +1,24 @@
+[user]
+	email = hi@brennannovak.com
+	name = Brennan Novak
+	signingkey = 0x0F8C68B2
+[core]
+	editor = vim
+	excludesfile = ~/.gitignore
+[commit]
+	gpgsign = true
+[gpg]
+	program = /usr/bin/qubes-gpg-client
+[alias]
+	st = status
+	br = branch
+	unstage = reset HEAD --
+	last = log -1 HEAD
+	visual = !gitk
+	commit-qweb = commit -S --gpg-sign=2FBC07A9 --author \"Brennan Novak <bnvk@invisiblethingslab.com>\"
+	hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+	pretty-log = log --graph --pretty=format:\"%Cred%h%Creset-%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset\"
+[color "diff"]
+	meta = red green bold
+[push]
+	default = simple

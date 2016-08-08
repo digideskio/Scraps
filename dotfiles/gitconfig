@@ -1,0 +1,12 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[remote "origin"]
+	url = git@github.com:Username/Repo
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[user]
+    email = hi@brennannovak.com
+    name = Brennan Novak
+	signingkey = 0x0F8C68B2
