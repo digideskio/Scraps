@@ -1,8 +1,8 @@
 #!/bin/bash
 # Unzip all items in a directory 
 
-for file in $1*
+for zip_file in $1/*
 do
-	echo unzipping: $file
-	unzip $file
+	echo unzipping: $zip_file
+	unzip $zip_file -d $1/
 done
