@@ -1,10 +1,12 @@
 # Exports
-export QUBES_GPG_DOMAIN=secret
-export QUBES_GPG_AUTOACCEPT=54000
 export EDITOR=vim
 
 # Helpers
 source /etc/bash_completion
+
+# Qubes
+export QUBES_GPG_DOMAIN=secret
+export QUBES_GPG_AUTOACCEPT=54000
 
 # RVM
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting

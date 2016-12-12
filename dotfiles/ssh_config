@@ -1,0 +1,4 @@
+Host 95.183.51.179
+	IndentityFile ~/.ssh/id_rsa_work
+	IndentitiesOnly yes
+	Port 22
