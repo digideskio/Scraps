@@ -7,16 +7,29 @@
 # into date specific folders 
 #
 # TODOs:
-# - Better handling & deleting of RAW
+# - Importing video files
+# - Deletinig of RAW source
 # - Renaming files by dates
-# - 
 #
-# Dependencies: rsync, imagemagick, ufraw, netpbm, dcraw
+# Dependencies: bash 4.3, rsync, imagemagick, ufraw, netpbm, dcraw
 #
 # -----------------------------------------------------------------------------
 # Manually create/edit a .backup_meisterrc config file in your home directory
 # -----------------------------------------------------------------------------
-# Preferably run as a cron job or manually with ./backup-meister
+#
+# declare -A CameraSD1=(
+#	[mount]="/media/user/CameraMount"
+#	[pictures_path]="DCIM/100MSDCF"
+#	[videos_path]="PRIVATE/AVCHD"
+#	[delete_source]="true"
+#	[delete_raw]="true"
+# )
+#
+# CAMERAS=(CameraSD1 CameraSD2)
+# PICTURES_PATH="/home/user/Pictures"
+#
+# -----------------------------------------------------------------------------
+# Preferably run as a cron job or manually with ./camera-meister.sh
 
 # Load Config
 source ~/.backup_meisterrc
@@ -36,21 +49,26 @@ SEASONS[10]="Fall"
 SEASONS[11]="Fall"
 SEASONS[12]="Winter"
 
-# Check Camera
-for CAMERA in "${CAMERAS[@]}"
-do
+# Check Cameras
+echo -e $LINE
+
+for idx in "${CAMERAS[@]}"; do
 	# Check if Mounted
-	if mount | grep $CAMERA > /dev/null; then
-		echo -e "\e[36mCamera ${CAMERA} is connected"
+    declare -n camera="$idx"
+
+	if mount | grep $camera[mount] > /dev/null; then
+		echo -e "\e[36mCamera: ${camera[mount]} connected"
 		echo -e $LINE
 		sleep 1	
 
 		# Copy Pictures
-		for picture in $CAMERA/$CAMERA_PICTURES/*
+		pictures_path="${camera[mount]}/${camera[pictures_path]}/"
+		echo "Getting pictures: $pictures_path"
+		for picture in "${pictures_path[@]}"*
 		do
 			# 1. Analyze Picture
-			echo -e "\e[94mAnalyzing $picture"
-			pic_info=$(identify -verbose $picture)
+			echo -e "\e[94mAnalyzing: $picture"
+			pic_info=$(identify -verbose "$picture")
 			pic_exif_datetime=$(echo "$pic_info" | grep "exif:DateTime:")
 			pic_datetime=${pic_exif_datetime/exif:DateTime: /""}
 			pic_date=${pic_datetime:0:-9}
@@ -72,33 +90,34 @@ do
 			fi
 
 			# 2. Copy Picture
-			echo -e "\e[94mCopying $picture --> $local_folder"
-			cp $picture $local_folder
+			echo -e "\e[94mCopying $picture"
+			echo -e "\e[37m--> $local_folder"
+			cp "$picture" "$local_folder"
 
 			# 3. Convert if RAW
 			extension_get="${picture##*.}"
 			extension="${extension_get,,}"
 			filename=$(basename "$picture" $extension_get)
 			if [[ $extension = "arw" ]]; then
-				echo "Converting RAW ${filename}arw --> ${filename}jpg"
+				echo -e "\e[94mConverting RAW ${filename}arw --> ${filename}jpg"
 				convert $picture $local_folder/${filename}jpg
 			elif [[ $extension = "nef" ]]; then
-				echo "Converting RAW ${filename}nef --> ${filename}jpg"
+				echo -e "\e[94mConverting RAW ${filename}nef --> ${filename}jpg"
 				dcraw -c -w $picture | convert -compress lzw - $local_folder/${filename}jpg
 			else
-				echo "$picture is not (or unkown) RAW"
+				echo -e "\e[94mFormat (${extension}) and is not RAW"
 			fi
 
 			# Delete RAW
-			#if [[ "$CAMERA_DELETE_RAW" = true ]]; then
+			#if [[ "${camera[delete_raw]}" = true ]]; then
 				# echo "Deleting local raw"
 				#rm $local_folder/${filename}
 			#fi
 
 			# 4. Delete From Camera
-			if [[ "$CAMERA_DELETE_SOURCE" = true ]]; then
-				echo "Deleting source file"
-				rm $picture
+			if [[ "${camera[delete_source]}" = true ]]; then
+				echo -e "\e[94mDeleting source file"
+				rm "$picture"
 			fi
 	
 			echo -e $LINE
@@ -106,7 +125,8 @@ do
 		echo "Done copying pictures!"
 		sleep 1
 	else
-		echo "Camera \"${CAMERA}\" is not connected :("
+		echo -e "\e[37mCamera ${camera} is not connected :("
+		echo -e $LINE
 	fi
 	sleep 1
 done

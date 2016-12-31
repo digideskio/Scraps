@@ -52,12 +52,13 @@ do
 		do
 			echo -e "\e[94mSyncing $BACKUP_PATH/$FOLDER --> \"$DRIVE/Backups/$FOLDER\""
 			echo -e $LINE
-			rsync -chazP --stats $BACKUP_PATH/$FOLDER $DRIVES_PATH/$DRIVE/Backups
+			rsync -chazP --stats --delete $BACKUP_PATH/$FOLDER $DRIVES_PATH/$DRIVE/Backups
 			echo -e $LINE
 			sleep 1
 		done
 	else
 		echo "Nope drive \"${DRIVE}\" is not connected :("
+		echo -e $LINE
 	fi
 	sleep 1
 done
